@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Servicios - Barbería Mapache</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link href="css/styles.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Barra lateral -->
+      <nav class="col-md-2 d-md-block sidebar">
+        <div class="text-center mb-4">
+          <i class="fa-solid fa-scissors fa-2x mb-2"></i>
+          <h5>Barbería Mapache</h5>
+        </div>
+        <ul class="nav flex-column">
+          <li><a class="nav-link" href="index.html"><i class="fa-regular fa-calendar"></i> Citas</a></li>
+          <li><a class="nav-link" href="barbero.html"><i class="fa-solid fa-user"></i> Barberos</a></li>
+          <li><a class="nav-link active" href="servicio.html"><i class="fa-solid fa-gear"></i> Servicio</a></li>
+        </ul>
+      </nav>
+
+      <!-- Main -->
+      <main class="col-md-10 ms-sm-auto px-md-4">
+        <div class="page-header">
+          <h2>Servicios</h2>
+          <p class="text-muted">Administra los servicios que ofrece la barbería</p>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4>Lista de servicios</h4>
+          <button id="btnNuevoServicio" class="btn btn-success">
+            <i class="fa fa-plus"></i> Nuevo servicio
+          </button>
+        </div>
+
+        <!-- Tabla siempre visible -->
+        <div class="table-responsive bg-white shadow-sm p-3 rounded">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th class="text-end">Costo</th>
+              </tr>
+            </thead>
+            <tbody id="tablaServicios">
+              <tr id="placeholder-servicio">
+                <td colspan="4" class="text-center text-muted">Cargando... (no hay servicios aún)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginación -->
+        <nav aria-label="Paginación servicios" class="mt-3">
+          <ul class="pagination justify-content-center" id="paginationServicios"></ul>
+        </nav>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal Crear/Editar Servicio -->
+  <div class="modal fade" id="modalServicio" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="formServicio">
+          <div class="modal-header">
+            <h5 class="modal-title">Nuevo servicio</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="servicioId" />
+            <div class="mb-3">
+              <label for="nombre" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="nombre" name="nombre" required />
+            </div>
+            <div class="mb-3">
+              <label for="descripcion" class="form-label">Descripción</label>
+              <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="costo" class="form-label">Costo (MXN)</label>
+              <input type="number" step="0.01" min="0" class="form-control" id="costo" name="costo" required />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Guardar</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts (mantén el orden: jQuery, Bootstrap, main.js si lo usas, luego services.js) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- opcional: si quieres también cargar tu main.js (sidebar behavior) -->
+  <script src="js/main.js"></script>
+
+  <!-- script exclusivo para servicios -->
+  <script src="js/servicios.js"></script>
+</body>
+
+</html>
