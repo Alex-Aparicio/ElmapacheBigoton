@@ -25,6 +25,7 @@
           <li><a class="nav-link active" href="index.html"><i class="fa-regular fa-calendar"></i> Citas</a></li>
           <li><a class="nav-link" href="barbero.html"><i class="fa-solid fa-user"></i> Barberos</a></li>
           <li><a class="nav-link" href="servicio.html"><i class="fa-solid fa-gear"></i> Servicio</a></li>
+          <li><a class="nav-link" href="sucursal.html"><i class="fa-solid fa-location-dot"></i>Sucursales</a></li>
         </ul>
       </nav>
 
@@ -94,6 +95,10 @@
                     <label for="servicio" class="form-label">Servicio</label>
                     <select class="form-select" id="servicio" name="servicio" required></select>
                   </div>
+                  <div class="mb-3">
+                    <label for="sucursal" class="form-label">Sucursal</label>
+                    <select class="form-select" id="sucursal" name="servicio" required></select>
+                  </div>
                 </div>
                 <div class="modal-footer">
                   <button type="submit" class="btn btn-success">Guardar</button>
@@ -103,6 +108,32 @@
             </div>
           </div>
         </div>
+
+
+        <!-- Modal Ver Detalles -->
+        <div class="modal fade" id="modalDetalles" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Detalles de la Cita</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                <p><strong>Fecha:</strong> <span id="detalleFecha"></span></p>
+                <p><strong>Hora:</strong> <span id="detalleHora"></span></p>
+                <p><strong>Cliente:</strong> <span id="detalleCliente"></span></p>
+                <p><strong>Barbero:</strong> <span id="detalleBarbero"></span></p>
+                <p><strong>Servicio:</strong> <span id="detalleServicio"></span></p>
+                <p><strong>Sucursal:</strong> <span id="detalleSucursal"></span></p>
+                <p><strong>Status:</strong> <span id="detalleStatus" class="badge"></span></p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>

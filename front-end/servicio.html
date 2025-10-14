@@ -24,6 +24,7 @@
           <li><a class="nav-link" href="index.html"><i class="fa-regular fa-calendar"></i> Citas</a></li>
           <li><a class="nav-link" href="barbero.html"><i class="fa-solid fa-user"></i> Barberos</a></li>
           <li><a class="nav-link active" href="servicio.html"><i class="fa-solid fa-gear"></i> Servicio</a></li>
+          <li><a class="nav-link" href="sucursal.html"><i class="fa-solid fa-location-dot"></i>Sucursales</a></li>
         </ul>
       </nav>
 
@@ -99,6 +100,35 @@
       </div>
     </div>
   </div>
+
+
+  <!-- Modal Ver Detalles del Servicio -->
+  <div class="modal fade" id="modalVerServicio" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Detalles del servicio</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <dl class="row mb-0">
+            <dt class="col-sm-4">Nombre</dt>
+            <dd class="col-sm-8" id="verNombre"></dd>
+
+            <dt class="col-sm-4">Descripción</dt>
+            <dd class="col-sm-8" id="verDescripcion"></dd>
+
+            <dt class="col-sm-4">Costo</dt>
+            <dd class="col-sm-8" id="verCosto"></dd>
+          </dl>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Scripts (mantén el orden: jQuery, Bootstrap, main.js si lo usas, luego services.js) -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -12,6 +12,8 @@ $(function () {
         headerElem.classList.remove("show");
       }
     });
+
+
   }
 
   const tmNav = document.getElementById("tm-nav");
@@ -28,6 +30,11 @@ $(function () {
   const pageSize = 10;
   const tablaId = "tablaCitas";
   const paginationId = "pagination";
+
+
+  const modalDetallesEl = document.getElementById("modalDetalles");
+  const modalDetalles = modalDetallesEl ? new bootstrap.Modal(modalDetallesEl) : null;
+
 
   // Modal bootstrap instance: solo si existe el modal en la página
   const modalEl = document.getElementById("modalNuevo");
@@ -52,7 +59,7 @@ $(function () {
   async function cargarCitas(page = 1) {
     const tbody = document.getElementById(tablaId);
     const placeholder = document.getElementById("placeholder-row");
-    if (!tbody) return; // si no hay tabla en esta página, no hacemos nada
+    if (!tbody) return;
 
     try {
       const res = await fetch(`http://localhost:8080/api/citas?page=${page - 1}&size=${pageSize}`);
@@ -61,7 +68,7 @@ $(function () {
       const items = data.content ?? data;
 
       if (!items || items.length === 0) {
-        if (placeholder) placeholder.innerHTML = `<td colspan="7" class="text-center text-muted">No hay citas</td>`;
+        if (placeholder) placeholder.innerHTML = `<td colspan="8" class="text-center text-muted">No hay citas</td>`;
         return;
       }
 
@@ -70,7 +77,10 @@ $(function () {
         const tr = document.createElement("tr");
         const barberoNombre = (cita.barbero && (cita.barbero.nombre || cita.barberoNombre)) ?? "—";
         const servicioNombre = (cita.servicio && (cita.servicio.nombre || cita.servicioNombre)) ?? "—";
+        const sucursalNombre = (cita.sucursal && (cita.sucursal.nombre || cita.sucursalNombre)) ?? "—";
         const status = cita.status ?? cita.estatus ?? "pendiente";
+
+
 
         tr.innerHTML = `
           <td>${cita.fecha ?? ''}</td>
@@ -78,6 +88,7 @@ $(function () {
           <td>${escapeHtml(cita.cliente ?? '')}</td>
           <td>${escapeHtml(barberoNombre)}</td>
           <td>${escapeHtml(servicioNombre)}</td>
+          <td>${escapeHtml(sucursalNombre)}</td>
           <td><span class="badge ${getStatusClass(status)}">${status}</span></td>
           <td>
             <button class="btn-action btn-ver" data-id="${cita.id}"><i class="fa fa-eye"></i></button>
@@ -88,29 +99,25 @@ $(function () {
         tbody.appendChild(tr);
       });
 
-      // reattach listeners
       attachCitaRowListeners();
     } catch (err) {
       console.error("No se pudieron cargar citas:", err);
-      if (placeholder) placeholder.innerHTML = `<td colspan="7" class="text-center text-danger">Error al cargar. Reintenta.</td>`;
+      if (placeholder) placeholder.innerHTML = `<td colspan="8" class="text-center text-danger">Error al cargar. Reintenta.</td>`;
     }
   }
 
-  // === Attach listeners for cita row actions ===
+  // === Listeners ===
   function attachCitaRowListeners() {
-    // Delete
     document.querySelectorAll(".btn-delete").forEach(btn => {
       btn.removeEventListener?.("click", onDeleteClick);
       btn.addEventListener("click", onDeleteClick);
     });
 
-    // Edit
     document.querySelectorAll(".btn-edit").forEach(btn => {
       btn.removeEventListener?.("click", onEditClick);
       btn.addEventListener("click", onEditClick);
     });
 
-    // View
     document.querySelectorAll(".btn-ver").forEach(btn => {
       btn.removeEventListener?.("click", onViewClick);
       btn.addEventListener("click", onViewClick);
@@ -139,16 +146,21 @@ $(function () {
       const clienteEl = document.getElementById("cliente");
       const barberoSel = document.getElementById("barbero");
       const servicioSel = document.getElementById("servicio");
+      const sucursalSel = document.getElementById("sucursal");
 
       if (fechaEl) fechaEl.value = c.fecha ?? "";
       if (horaEl) horaEl.value = c.hora ?? "";
       if (clienteEl) clienteEl.value = c.cliente ?? "";
 
-      if (barberoSel) await cargarBarberos();
-      if (servicioSel) await cargarServicios();
+      await Promise.all([
+        barberoSel ? cargarBarberos() : null,
+        servicioSel ? cargarServicios() : null,
+        sucursalSel ? cargarSucursales() : null
+      ]);
 
       if (barberoSel) barberoSel.value = c.barbero?.id ?? c.barberoId ?? "";
       if (servicioSel) servicioSel.value = c.servicio?.id ?? c.servicioId ?? "";
+      if (sucursalSel) sucursalSel.value = c.sucursal?.id ?? c.sucursalId ?? "";
 
       const formEl = document.getElementById("formNuevo");
       if (formEl) formEl.dataset.editId = id;
@@ -159,12 +171,39 @@ $(function () {
     }
   }
 
-  function onViewClick(e) {
+  async function onViewClick(e) {
     const id = e.currentTarget.getAttribute("data-id");
-    window.location.href = `/citas/${id}`;
+    try {
+      const res = await fetch(`http://localhost:8080/api/citas/${id}`);
+      if (!res.ok) throw new Error();
+      const c = await res.json();
+
+      document.getElementById("detalleFecha").textContent = c.fecha ?? "—";
+      document.getElementById("detalleHora").textContent = c.hora ?? "—";
+      document.getElementById("detalleCliente").textContent = c.cliente ?? "—";
+
+      const barbero = c.barbero?.nombre || c.barberoNombre || "—";
+      const servicio = c.servicio?.nombre || c.servicioNombre || "—";
+      const sucursal = c.sucursal?.direccion || c.sucursalNombre || "—";
+      const status = c.status ?? c.estatus ?? "pendiente";
+
+      document.getElementById("detalleBarbero").textContent = barbero;
+      document.getElementById("detalleServicio").textContent = servicio;
+      document.getElementById("detalleSucursal").textContent = sucursal;
+
+      const statusEl = document.getElementById("detalleStatus");
+      statusEl.textContent = status;
+      statusEl.className = `badge ${getStatusClass(status)}`;
+
+      if (modalDetalles) modalDetalles.show();
+    } catch (err) {
+      console.error("Error al cargar detalles:", err);
+      alert("No se pudo cargar la cita.");
+    }
   }
 
-  // === cargar barberos y servicios para selects (compatibles Page<T> o array) ===
+
+  // === cargar barberos ===
   async function cargarBarberos() {
     try {
       const res = await fetch("http://localhost:8080/api/barberos");
@@ -179,12 +218,13 @@ $(function () {
       }
       sel.innerHTML = items.map(b => `<option value="${b.id}">${escapeHtml(b.nombre)}</option>`).join("");
     } catch (err) {
-      console.error("Error cargando barberos para select:", err);
+      console.error("Error cargando barberos:", err);
       const sel = document.getElementById("barbero");
       if (sel) sel.innerHTML = `<option value="">Error</option>`;
     }
   }
 
+  // === cargar servicios ===
   async function cargarServicios() {
     try {
       const res = await fetch("http://localhost:8080/api/servicios");
@@ -199,13 +239,34 @@ $(function () {
       }
       sel.innerHTML = items.map(s => `<option value="${s.id}">${escapeHtml(s.nombre)}</option>`).join("");
     } catch (err) {
-      console.error("Error cargando servicios para select:", err);
+      console.error("Error cargando servicios:", err);
       const sel = document.getElementById("servicio");
       if (sel) sel.innerHTML = `<option value="">Error</option>`;
     }
   }
 
-  // === Submit handler para crear/editar cita (con logs de debugging) ===
+  // === NUEVO: cargar sucursales ===
+  async function cargarSucursales() {
+    try {
+      const res = await fetch("http://localhost:8080/api/sucursales");
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      const items = data.content ?? data;
+      const sel = document.getElementById("sucursal");
+      if (!sel) return;
+      if (!items || items.length === 0) {
+        sel.innerHTML = `<option value="">-- Sin sucursales --</option>`;
+        return;
+      }
+      sel.innerHTML = items.map(s => `<option value="${s.id}">${escapeHtml(s.direccion)}</option>`).join("");
+    } catch (err) {
+      console.error("Error cargando sucursales:", err);
+      const sel = document.getElementById("sucursal");
+      if (sel) sel.innerHTML = `<option value="">Error</option>`;
+    }
+  }
+
+  // === Submit handler ===
   const formNuevoEl = document.getElementById("formNuevo");
   if (formNuevoEl) {
     formNuevoEl.addEventListener("submit", async (e) => {
@@ -213,17 +274,18 @@ $(function () {
       const editId = e.currentTarget.dataset.editId ?? null;
 
       const payload = {
-        fecha: (document.getElementById("fecha")?.value) ?? null,
-        hora: (document.getElementById("hora")?.value) ?? null,
-        cliente: (document.getElementById("cliente")?.value) ?? null,
+        fecha: document.getElementById("fecha")?.value ?? null,
+        hora: document.getElementById("hora")?.value ?? null,
+        cliente: document.getElementById("cliente")?.value ?? null,
         barberoId: Number(document.getElementById("barbero")?.value) || null,
-        servicioId: Number(document.getElementById("servicio")?.value) || null
+        servicioId: Number(document.getElementById("servicio")?.value) || null,
+        sucursalId: Number(document.getElementById("sucursal")?.value) || null
       };
 
       console.log("Payload a enviar:", payload);
 
-      if (!payload.barberoId || !payload.servicioId) {
-        alert("Selecciona barbero y servicio.");
+      if (!payload.barberoId || !payload.servicioId || !payload.sucursalId) {
+        alert("Selecciona barbero, servicio y sucursal.");
         return;
       }
 
@@ -236,31 +298,27 @@ $(function () {
           body: JSON.stringify(payload)
         });
 
-        console.log("HTTP status:", res.status);
         const text = await res.text();
         let json;
         try { json = JSON.parse(text); } catch (err) { json = text; }
-        console.log("Response body:", json);
 
         if (res.ok) {
           if (modal) modal.hide();
-          // reset del formulario — preferimos usar e.currentTarget si está disponible
-          try { e.currentTarget?.reset(); } catch (_) { /* no critical */ }
+          e.currentTarget?.reset();
           delete e.currentTarget?.dataset.editId;
           cargarCitas(1);
           alert("Cita guardada correctamente");
         } else {
-          const serverMsg = (json && (json.message || json.error || json)) || text;
-          alert("Error guardando cita: " + serverMsg);
+          alert("Error guardando cita: " + (json.message || json.error || json));
         }
       } catch (err) {
         console.error("Error fetch:", err);
-        alert("Error al guardar (problema de red o CORS). Revisa la consola.");
+        alert("Error al guardar cita.");
       }
     });
   }
 
-  // === Botón Nuevo (abre modal) ===
+  // === Botón Nuevo ===
   const btnNuevo = document.getElementById("btnNuevo");
   if (btnNuevo) {
     btnNuevo.addEventListener("click", async () => {
@@ -269,20 +327,22 @@ $(function () {
         form.reset();
         delete form.dataset.editId;
       }
-      // cargar selects antes de mostrar modal (si existen)
-      await Promise.all([cargarBarberos(), cargarServicios()]);
+      await Promise.all([
+        cargarBarberos(),
+        cargarServicios(),
+        cargarSucursales()
+      ]);
       if (modal) modal.show();
     });
   }
 
-  // === Paginación (siempre la manejamos con botones creados por el backend en renderPagination) ===
+  // === Paginación ===
   function renderPagination(totalPages, activePage) {
     const pagination = document.getElementById(paginationId);
     if (!pagination) return;
     pagination.innerHTML = "";
     if (totalPages <= 1) return;
 
-    // Prev
     const prevLi = document.createElement("li");
     prevLi.className = `page-item ${activePage === 1 ? "disabled" : ""}`;
     prevLi.innerHTML = `<a class="page-link" href="#">«</a>`;
@@ -302,7 +362,6 @@ $(function () {
       pagination.appendChild(li);
     }
 
-    // Next
     const nextLi = document.createElement("li");
     nextLi.className = `page-item ${activePage === totalPages ? "disabled" : ""}`;
     nextLi.innerHTML = `<a class="page-link" href="#">»</a>`;
@@ -310,9 +369,8 @@ $(function () {
     pagination.appendChild(nextLi);
   }
 
-  // === Initialize only on pages with the table (index.html) ===
+  // === Inicialización ===
   if (document.getElementById(tablaId)) {
     cargarCitas(1);
   }
-
 });

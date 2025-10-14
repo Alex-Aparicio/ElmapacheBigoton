@@ -135,12 +135,29 @@ $(function () {
       });
     });
 
+    const modalVerEl = document.getElementById("modalVerServicio");
+    const modalVer = new bootstrap.Modal(modalVerEl);
+
     document.querySelectorAll(".btn-ver-servicio").forEach(btn => {
-      btn.addEventListener("click", (e) => {
+      btn.addEventListener("click", async (e) => {
         const id = e.currentTarget.getAttribute("data-id");
-        window.location.href = `/servicios/${id}`;
+        try {
+          const res = await fetch(`http://localhost:8080/api/servicios/${id}`);
+          if (!res.ok) throw new Error("No se pudo obtener el servicio");
+          const s = await res.json();
+
+          document.getElementById("verNombre").textContent = s.nombre ?? "";
+          document.getElementById("verDescripcion").textContent = s.descripcion ?? "(Sin descripción)";
+          document.getElementById("verCosto").textContent = formatCurrency(s.costo);
+
+          modalVer.show();
+        } catch (err) {
+          console.error("Error al obtener detalles del servicio:", err);
+          alert("Error al cargar los detalles del servicio");
+        }
       });
     });
+
   }
 
   document.getElementById("formServicio").addEventListener("submit", async (e) => {
