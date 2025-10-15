@@ -19,7 +19,7 @@ public class ServicioController {
 
     @GetMapping
     public ResponseEntity<Page<Servicio>> all(@RequestParam(defaultValue = "0") int page,
-                                              @RequestParam(defaultValue = "10") int size) {
+                                            @RequestParam(defaultValue = "10") int size) {
         Pageable p = PageRequest.of(page, size, Sort.by("nombre"));
         Page<Servicio> result = repo.findAll(p);
         return ResponseEntity.ok(result);
@@ -33,7 +33,7 @@ public class ServicioController {
     @PostMapping
     public ResponseEntity<Servicio> create(@RequestBody Servicio s, UriComponentsBuilder uriBuilder) {
         Servicio saved = repo.save(s);
-        URI uri = uriBuilder.path("/api/servicios/{id}").buildAndExpand(saved.getId()).toUri();
+        URI uri = uriBuilder.path("http://localhost:8080/api/servicios/{id}").buildAndExpand(saved.getId()).toUri();
         return ResponseEntity.created(uri).body(saved);
     }
 

@@ -19,7 +19,7 @@ public class BarberoController {
 
     @GetMapping
     public ResponseEntity<Page<Barbero>> all(@RequestParam(defaultValue = "0") int page,
-                                             @RequestParam(defaultValue = "10") int size) {
+                                            @RequestParam(defaultValue = "10") int size) {
         Pageable p = PageRequest.of(page, size, Sort.by("nombre"));
         Page<Barbero> result = repo.findAll(p);
         return ResponseEntity.ok(result);
@@ -33,7 +33,7 @@ public class BarberoController {
     @PostMapping
     public ResponseEntity<Barbero> create(@RequestBody Barbero b, UriComponentsBuilder uriBuilder) {
         Barbero saved = repo.save(b);
-        URI uri = uriBuilder.path("/api/barberos/{id}").buildAndExpand(saved.getId()).toUri();
+        URI uri = uriBuilder.path("http://localhost:8080/api/barberos/{id}").buildAndExpand(saved.getId()).toUri();
         return ResponseEntity.created(uri).body(saved);
     }
 

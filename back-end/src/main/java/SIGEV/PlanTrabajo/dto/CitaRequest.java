@@ -8,6 +8,7 @@ public class CitaRequest {
     private String cliente;
     private Long barberoId;
     private Long servicioId;
+    private Long sucursalId;
 
     public CitaRequest() {}
 
@@ -25,4 +26,7 @@ public class CitaRequest {
 
     public Long getServicioId() { return servicioId; }
     public void setServicioId(Long servicioId) { this.servicioId = servicioId; }
+
+    public Long getSucursalId() { return sucursalId; }
+    public void setSucursalId(Long sucursalId) { this.sucursalId = sucursalId; }
 }

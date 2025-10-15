@@ -1,5 +1,4 @@
 $(function () {
-  // Variables
   let currentPage = 1;
   const pageSize = 10;
   const tablaId = "tablaBarberos";
@@ -45,7 +44,6 @@ $(function () {
         tr.innerHTML = `
           <td>${escapeHtml(b.nombre)}</td>
           <td>
-            <button class="btn-action btn-ver-barbero btn-sm me-1" data-id="${b.id}" title="Ver"><i class="fa fa-eye"></i></button>
             <button class="btn-action btn-edit-barbero btn-sm me-1" data-id="${b.id}" title="Editar"><i class="fa fa-pen"></i></button>
             <button class="btn-action btn-delete-barbero btn-sm text-danger" data-id="${b.id}" title="Eliminar"><i class="fa fa-trash"></i></button>
           </td>
@@ -126,14 +124,6 @@ $(function () {
           console.error("No se pudo cargar barbero", err);
           alert("Error al cargar barbero");
         }
-      });
-    });
-
-    // View
-    document.querySelectorAll(".btn-ver-barbero").forEach(btn => {
-      btn.addEventListener("click", (e) => {
-        const id = e.currentTarget.getAttribute("data-id");
-        window.location.href = `/barberos/${id}`; 
       });
     });
   }

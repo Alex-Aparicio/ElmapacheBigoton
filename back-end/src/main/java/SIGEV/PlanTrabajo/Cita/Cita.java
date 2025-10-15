@@ -2,6 +2,7 @@ package SIGEV.PlanTrabajo.Cita;
 
 import SIGEV.PlanTrabajo.Barbero.Barbero;
 import SIGEV.PlanTrabajo.Servicio.Servicio;
+import SIGEV.PlanTrabajo.Sucursal.Sucursal;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -15,7 +16,6 @@ public class Cita {
 
     private LocalDate fecha;
 
-   
     private String hora;
 
     private String cliente;
@@ -29,6 +29,12 @@ public class Cita {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "servicio_id")
     private Servicio servicio;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "sucursal_id")
+    private Sucursal sucursal;
+
+
 
     public Cita() {}
 
@@ -53,4 +59,7 @@ public class Cita {
 
     public Servicio getServicio() { return servicio; }
     public void setServicio(Servicio servicio) { this.servicio = servicio; }
+
+    public Sucursal getSucursal() { return sucursal; }
+    public void setSucursal(Sucursal sucursal) { this.sucursal = sucursal; }
 }
